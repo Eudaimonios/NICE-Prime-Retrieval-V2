@@ -205,7 +205,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td>1 – 99</td><td><strong>Sādhyāka</strong></td><td>Beginner's <em>Mind‑Clearing & Stability</em></td><td>Basic breath tracking, noticing thought‑streams</td></tr>
+      <tr><td>0 – 99</td><td><strong>Sādhyāka</strong></td><td>Beginner's <em>Mind‑Clearing & Stability</em></td><td>Basic breath tracking, noticing thought‑streams</td></tr>
       <tr><td>100 – 999</td><td><strong>Bhikṣu</strong></td><td>Apprentice's <em>Subtle‑Sense Activation</em></td><td>Synchronicity spotting, symbolic decoding</td></tr>
       <tr><td>1,000 – 9,999</td><td><strong>Arahant</strong></td><td>Adept's <em>Shadow‑Integration & Resilience</em></td><td>Lucid dreaming, inner‑archetype dialogues</td></tr>
       <tr><td>10,000 – 99,999</td><td><strong>Bodhisattva</strong></td><td>Visionary <em>Non‑Local Consciousness Access</em></td><td>Telepathic inklings, transpersonal insights</td></tr>
@@ -239,7 +239,7 @@
 
   <label for="difficultySelect" style="display:block; max-width:350px; margin: 20px auto 0 auto; user-select:none;">Select Your Stage</label>
   <select id="difficultySelect" aria-label="Choose your spiritual stage">
-    <option value="1">Sādhyāka (1 – 99)</option>
+    <option value="1">Sādhyāka (0 – 99)</option>
     <option value="2">Bhikṣu (100 – 999)</option>
     <option value="3">Arahant (1,000 – 9,999)</option>
     <option value="4">Bodhisattva (10,000 – 99,999)</option>
@@ -255,7 +255,7 @@
   </div>
 
   <div id="inputSection" style="display:none; margin-top: 1.5em; max-width: 350px; margin-left:auto; margin-right:auto;">
-    <label for="userGuess" style="display:block; margin-bottom: 5px;">Enter the prime you received:</label>
+    <label for="userGuess" style="display:block; margin-bottom: 5px;">Enter the prime number you received:</label>
     <input type="number" id="userGuess" placeholder="Your recalled prime number" autocomplete="off" />
     <button id="testSignalBtn">Test My Signal!</button>
   </div>
@@ -289,12 +289,12 @@
 <script>
   // Prime generation with sieve of Eratosthenes (up to 1 million)
   const primeList = [];
-  
+
   function generatePrimesUpTo(limit) {
     console.log("Generating primes up to", limit);
     const sieve = new Array(limit + 1).fill(true);
     sieve[0] = sieve[1] = false;
-    
+
     for (let i = 2; i * i <= limit; i++) {
       if (sieve[i]) {
         for (let j = i * i; j <= limit; j += i) {
@@ -302,19 +302,19 @@
         }
       }
     }
-    
+
     for (let i = 2; i <= limit; i++) {
       if (sieve[i]) primeList.push(i);
     }
     console.log("Generated", primeList.length, "primes");
   }
-  
+
   // Generate primes up to 1 million
   generatePrimesUpTo(1000000);
 
-  // Stage data: ranges, names, next signs for display and logic
+  // Stage data: ranges based on prime VALUES, not indices
   const stages = {
-    1: { name: "Sādhyāka", range: [1, 99] },
+    1: { name: "Sādhyāka", range: [0, 99] },
     2: { name: "Bhikṣu", range: [100, 999] },
     3: { name: "Arahant", range: [1000, 9999] },
     4: { name: "Bodhisattva", range: [10000, 99999] },
@@ -385,11 +385,11 @@
       historyContainer.innerHTML = 'No sessions recorded yet.';
       return;
     }
-    
+
     let html = '<strong>Recent Sessions:</strong><br>';
     const recent = sessionHistory.slice(-10).reverse();
     recent.forEach((session, i) => {
-      html += `${recent.length - i}. Stage ${session.stage} - Prime: ${session.actualPrime} | Guess: ${session.guess} | Closeness: ${session.closeness.toFixed(1)}%<br>`;
+      html += `${recent.length - i}. Stage ${session.stage} - ${session.primeIndex}th prime = ${session.actualPrime} | Guess: ${session.guess} | Closeness: ${session.closeness.toFixed(1)}%<br>`;
     });
     historyContainer.innerHTML = html;
   }
@@ -399,11 +399,11 @@
     const ctx = trendCanvas.getContext('2d');
     const width = trendCanvas.width;
     const height = trendCanvas.height;
-    
+
     // Clear canvas
     ctx.fillStyle = '#111';
     ctx.fillRect(0, 0, width, height);
-    
+
     if (sessionHistory.length === 0) {
       ctx.fillStyle = '#777';
       ctx.font = '16px Arial';
@@ -411,7 +411,7 @@
       ctx.fillText('No data yet - start your first session!', width/2, height/2);
       return;
     }
-    
+
     // Draw grid
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 1;
@@ -422,18 +422,18 @@
       ctx.lineTo(width - 20, y);
       ctx.stroke();
     }
-    
+
     // Draw trend line
     if (sessionHistory.length > 1) {
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      
+
       const recent = sessionHistory.slice(-20); // Show last 20 sessions
       recent.forEach((session, i) => {
         const x = 40 + (width - 60) * i / (recent.length - 1);
         const y = height - 20 - (height - 40) * session.closeness / 100;
-        
+
         if (i === 0) {
           ctx.moveTo(x, y);
         } else {
@@ -441,7 +441,7 @@
         }
       });
       ctx.stroke();
-      
+
       // Draw points
       ctx.fillStyle = '#ffd700';
       recent.forEach((session, i) => {
@@ -452,7 +452,7 @@
         ctx.fill();
       });
     }
-    
+
     // Draw labels
     ctx.fillStyle = '#aaa';
     ctx.font = '12px Arial';
@@ -467,13 +467,13 @@
   function initAmbientCanvas() {
     const canvas = document.getElementById('ambientCanvas');
     const ctx = canvas.getContext('2d');
-    
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
+
     const particles = [];
     const numParticles = 50;
-    
+
     // Create particles
     for (let i = 0; i < numParticles; i++) {
       particles.push({
@@ -485,31 +485,31 @@
         opacity: Math.random() * 0.3 + 0.1
       });
     }
-    
+
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       particles.forEach(particle => {
         particle.x += particle.vx;
         particle.y += particle.vy;
-        
+
         // Wrap around edges
         if (particle.x < 0) particle.x = canvas.width;
         if (particle.x > canvas.width) particle.x = 0;
         if (particle.y < 0) particle.y = canvas.height;
         if (particle.y > canvas.height) particle.y = 0;
-        
+
         // Draw particle
         ctx.fillStyle = `rgba(255, 215, 0, ${particle.opacity})`;
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, 2 * Math.PI);
         ctx.fill();
       });
-      
+
       requestAnimationFrame(animate);
     }
     animate();
-    
+
     // Resize handler
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
@@ -531,8 +531,8 @@
 
   startRetrievalBtn.addEventListener('click', () => {
     console.log("Summon Prime clicked, current stage:", currentStage);
-    
-    retrievalStatus.textContent = "Selecting your prime index...";
+
+    retrievalStatus.textContent = "Selecting your prime...";
     inputSection.style.display = 'none';
     resultsSection.style.display = 'none';
     userGuessInput.value = "";
@@ -541,28 +541,35 @@
     const [minVal, maxVal] = stages[currentStage].range;
     console.log("Range for stage", currentStage, ":", minVal, "to", maxVal);
 
-    // For stage ranges, we need to select a random prime INDEX within the range
-    // Stage 1: 1-99 means select the 1st to 99th prime
-    // Stage 2: 100-999 means select the 100th to 999th prime  
-    // etc.
-    
-    if (primeList.length < maxVal) {
-      retrievalStatus.textContent = "Not enough primes generated for this stage.";
-      console.log("Not enough primes generated!");
+    // Filter primes that fall within the stage's VALUE range
+    const validPrimes = [];
+    primeList.forEach((prime, index) => {
+      if (prime >= minVal && prime <= maxVal) {
+        validPrimes.push({
+          value: prime,
+          index: index + 1 // 1-based index (1st prime, 2nd prime, etc.)
+        });
+      }
+    });
+
+    if (validPrimes.length === 0) {
+      retrievalStatus.textContent = "No primes found in this stage range.";
+      console.log("No primes found in stage range!");
       return;
     }
 
-    // Randomly select a prime index within the stage range
-    selectedPrimeIndex = minVal + Math.floor(Math.random() * (maxVal - minVal + 1));
-    selectedPrime = primeList[selectedPrimeIndex - 1]; // Convert to 0-based array index
+    // Randomly select a prime from the valid primes in this stage
+    const randomPrime = validPrimes[Math.floor(Math.random() * validPrimes.length)];
+    selectedPrime = randomPrime.value;
+    selectedPrimeIndex = randomPrime.index;
 
-    console.log("Selected prime index:", selectedPrimeIndex, "Prime value:", selectedPrime);
+    console.log("Selected prime:", selectedPrime, "at index:", selectedPrimeIndex);
 
-    // Show the index immediately and allow user to enter their guess
+    // Show the ordinal position and allow user to enter their guess
     primeIndexDisplay.textContent = selectedPrimeIndex;
     inputSection.style.display = "block";
     retrievalStatus.textContent = `You are seeking the ${selectedPrimeIndex}th prime. What number do you receive?`;
-    
+
     // Focus on the input field
     userGuessInput.focus();
   });
@@ -584,31 +591,25 @@
 
     const actual = selectedPrime;
     const absError = Math.abs(guess - actual);
-    
+
     // Calculate closeness percentage (higher is better)
     const percentCloseness = Math.max(0, (1 - absError / actual) * 100);
 
     // Calculate statistical significance compared to random chance
     const [minVal, maxVal] = stages[currentStage].range;
-    const stageRangeSize = maxVal - minVal + 1;
-    
-    // For random chance baseline, we need to consider the distribution of primes in this index range
-    // Get all primes in this stage index range
-    const stageMinPrime = primeList[minVal - 1];
-    const stageMaxPrime = primeList[maxVal - 1];
-    const primeRangeSize = stageMaxPrime - stageMinPrime + 1;
-    
-    // Expected random error (mean absolute deviation for uniform distribution)
-    const expectedRandomError = primeRangeSize / 3;
-    
+
+    // For random chance baseline, consider the range of possible values
+    const rangeSize = maxVal - minVal + 1;
+    const expectedRandomError = rangeSize / 3; // Mean absolute deviation for uniform distribution
+
     // Calculate how much better (or worse) this guess is compared to random
     const randomCloseness = Math.max(0, (1 - expectedRandomError / actual) * 100);
     const improvementOverRandom = percentCloseness - randomCloseness;
-    
+
     // Z-score calculation (how many standard deviations from random)
-    const stdDev = primeRangeSize / 6; // Approximate std dev for uniform distribution
+    const stdDev = rangeSize / 6; // Approximate std dev for uniform distribution
     const zScore = (expectedRandomError - absError) / stdDev;
-    
+
     // Convert z-score to percentile (statistical significance)
     const significance = Math.max(0, Math.min(100, 50 + (zScore * 15))); // Rough conversion
 
@@ -616,7 +617,7 @@
     console.log("Actual prime:", actual);
     console.log("Guess:", guess);
     console.log("Absolute error:", absError);
-    console.log("Stage prime range:", stageMinPrime, "to", stageMaxPrime);
+    console.log("Stage range:", minVal, "to", maxVal);
     console.log("Expected random error:", expectedRandomError);
     console.log("Z-score:", zScore);
 
@@ -663,7 +664,7 @@
 
     resultsDiv.innerHTML = resultHtml;
     resultsSection.style.display = 'block';
-    
+
     updateHistoryUI();
     drawTrendChart();
   });
@@ -673,7 +674,7 @@
       alert("No sessions to share yet!");
       return;
     }
-    
+
     const lastSession = sessionHistory[sessionHistory.length - 1];
     const shareText = `I just practiced NICE Prime-Retrieval! 🧠✨
 Stage: ${lastSession.stageName}
@@ -681,7 +682,7 @@ Target: ${lastSession.actualPrime} (${lastSession.primeIndex}th prime)
 My guess: ${lastSession.guess}
 Closeness: ${lastSession.closeness.toFixed(1)}%
 Train your intuition: https://example.com/nice-prime-app`;
-    
+
     if (navigator.share) {
       navigator.share({
         title: 'NICE Prime-Retrieval Results',
