@@ -3,106 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NICE Prime-Retrieval Practice</title>
+  <title>NICE Prime-Retrieval App</title>
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; line-height: 1.6; padding: 0 20px; }
-    h1, h2 { text-align: center; }
+    body { font-family: sans-serif; max-width: 900px; margin: 40px auto; line-height: 1.6; padding: 0 20px; }
+    h1, h2, h3 { text-align: center; }
     .section { margin-bottom: 30px; }
-    select, button, input { padding: 8px; margin: 5px 0; font-size: 1rem; }
+    select, button, input { padding: 8px; margin: 10px 0; font-size: 1rem; width: 100%; }
     #primeDisplay, #results { font-weight: bold; margin-top: 10px; }
     #results { background: #f0f0f0; padding: 10px; border-radius: 5px; }
-    .encourage { margin-top: 20px; font-style: italic; }
+    .encourage { margin-top: 20px; font-style: italic; text-align: center; }
+    .bullet { margin-left: 20px; }
+    code { background: #e4e4e4; padding: 2px 4px; border-radius: 3px; }
   </style>
 </head>
 <body>
-  <h1>NICE Prime-Retrieval Practice</h1>
+  <h1>NICE Prime-Retrieval App</h1>
 
   <div class="section">
-    <p><strong>Objective:</strong> Train your memory and pattern-recognition by recalling prime numbers. This practice enhances scientific acuity (pattern detection), phenomenological awareness (inner attention), and spiritual presence (focus & discipline).</p>
+    <h3>Why Prime Numbers Matter</h3>
+    <p>Primes are the indivisible atoms of mathematics — foundations of order, unpredictability, and elegance. Training your mind to retrieve them improves:</p>
+    <ul class="bullet">
+      <li><strong>Scientific clarity</strong> – sharpen pattern recognition & memory</li>
+      <li><strong>Phenomenological depth</strong> – enter focused inner states of awareness</li>
+      <li><strong>Spiritual insight</strong> – primes reflect hidden order and cosmic intelligence</li>
+    </ul>
   </div>
 
   <div class="section">
-    <label for="difficulty"><strong>Select Difficulty Stage:</strong></label><br>
+    <h3>Pre-Practice Preparation (Optional but Potent)</h3>
+    <ul class="bullet">
+      <li>Take a cold shower</li>
+      <li>Fast for at least 4–8 hours</li>
+      <li>Practice 5–10 mins of asana</li>
+      <li>Engage in 3–5 mins of pranayama (e.g., box breathing)</li>
+      <li>Drink warm tea (no sugar, no milk)</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>Choose Your NICE Level</h3>
+    <label for="difficulty">Prime Length Range (based on value):</label>
     <select id="difficulty" onchange="updateDifficultyInfo()">
-      <option value="easy">Easy (primes &lt; 100)</option>
-      <option value="medium">Medium (primes &lt; 1,000)</option>
-      <option value="hard">Hard (primes &lt; 10,000)</option>
+      <option value="1">Level I – Initiate (primes &lt; 100)</option>
+      <option value="2">Level II – Novice (100–999)</option>
+      <option value="3">Level III – Adept (1,000–9,999)</option>
+      <option value="4">Level IV – Mystic (10,000–99,999)</option>
+      <option value="5">Level V – Oracle (100,000–999,999)</option>
     </select>
-    <p id="difficultyInfo">Easy stage uses primes under 100. Mastering this builds basic recall pathways.</p>
+    <p id="difficultyInfo">Select a level to reveal its benefits and challenges.</p>
   </div>
 
   <div class="section">
-    <button onclick="generatePrime()">Generate Random Prime</button>
+    <button onclick="generatePrimeOrder()">Begin Retrieval</button>
     <div id="primeDisplay"></div>
   </div>
 
   <div class="section" id="inputSection" style="display:none;">
-    <p>Enter the number you recalled:</p>
-    <input type="number" id="userGuess" placeholder="Your recalled number">
-    <button onclick="checkGuess()">Check Accuracy</button>
+    <p>Type the prime number you retrieved through inner recall:</p>
+    <input type="number" id="userGuess" placeholder="Your recalled prime number">
+    <button onclick="checkGuess()">Test Your Signal</button>
   </div>
 
   <div class="section" id="resultsSection" style="display:none;">
     <div id="results"></div>
-    <div class="encourage">Keep refining your focus—each attempt strengthens your memory and insight.</div>
+    <div class="encourage">Stay on the path. Each retrieval deepens your perception and strengthens your will.</div>
   </div>
 
 <script>
-  let currentPrime = null;
+  const primeList = [];
+
+  function generatePrimesUpTo(limit) {
+    const sieve = new Array(limit + 1).fill(true);
+    sieve[0] = sieve[1] = false;
+    for (let i = 2; i * i <= limit; i++) {
+      if (sieve[i]) {
+        for (let j = i * i; j <= limit; j += i) {
+          sieve[j] = false;
+        }
+      }
+    }
+    for (let i = 2; i <= limit; i++) {
+      if (sieve[i]) primeList.push(i);
+    }
+  }
+
+  // Generate primes once on load
+  generatePrimesUpTo(1000000);
+
+  const difficultyRanges = {
+    1: [1, 99],
+    2: [100, 999],
+    3: [1000, 9999],
+    4: [10000, 99999],
+    5: [100000, 999999]
+  };
+
+  const descriptions = {
+    1: "Level I – Builds basic recall and inner silence.",
+    2: "Level II – Trains short-term focus and symbolic tracking.",
+    3: "Level III – Develops long-chain numeric awareness.",
+    4: "Level IV – Tests your depth of focus and subtle mind.",
+    5: "Level V – Invokes high agency and mathematical intuition."
+  };
+
+  let selectedPrime = null;
 
   function updateDifficultyInfo() {
     const diff = document.getElementById('difficulty').value;
-    const info = document.getElementById('difficultyInfo');
-    if (diff === 'easy') info.textContent = 'Easy stage uses primes under 100. Mastering this builds basic recall pathways.';
-    if (diff === 'medium') info.textContent = 'Medium stage uses primes under 1,000. Strengthen pattern grouping and deeper concentration.';
-    if (diff === 'hard') info.textContent = 'Hard stage uses primes under 10,000. Cultivate high-agency focus and resilience.';
+    document.getElementById('difficultyInfo').textContent = descriptions[diff];
   }
 
-  function generatePrime() {
+  function generatePrimeOrder() {
     const diff = document.getElementById('difficulty').value;
-    let limit = diff === 'easy' ? 100 : (diff === 'medium' ? 1000 : 10000);
-    const primes = getPrimesUpTo(limit);
-    currentPrime = primes[Math.floor(Math.random() * primes.length)];
-    document.getElementById('primeDisplay').textContent = `Memorize this prime: ${currentPrime}`;
+    const [minVal, maxVal] = difficultyRanges[diff];
+
+    const candidates = primeList.filter(p => p >= minVal && p <= maxVal);
+    const randomIndex = Math.floor(Math.random() * candidates.length);
+    selectedPrime = candidates[randomIndex];
+    const primeOrder = primeList.indexOf(selectedPrime) + 1;
+
+    document.getElementById('primeDisplay').textContent = `Retrieve the prime at position: ${primeOrder}`;
     document.getElementById('inputSection').style.display = 'block';
     document.getElementById('resultsSection').style.display = 'none';
   }
 
   function checkGuess() {
-    const guess = parseInt(document.getElementById('userGuess').value, 10);
-    if (!currentPrime || isNaN(guess)) return;
-    const closeness = Math.max(0, (1 - Math.abs(currentPrime - guess) / currentPrime) * 100).toFixed(2);
-    const randScore = computeEntropy(currentPrime.toString()).toFixed(2);
+    const guess = parseInt(document.getElementById('userGuess').value);
+    if (!selectedPrime || isNaN(guess)) return;
+    const diff = Math.abs(selectedPrime - guess);
+    const [minVal, maxVal] = Object.values(difficultyRanges)[document.getElementById('difficulty').value - 1];
+    const stdev = Math.sqrt((maxVal - minVal) ** 2 / 12);
+    const randChance = (1 / (maxVal - minVal + 1) * 100).toFixed(8);
+    const closeness = Math.max(0, (1 - diff / (maxVal - minVal)) * 100).toFixed(2);
+
+    const link = `${window.location.origin}${window.location.pathname}?guess=${guess}&actual=${selectedPrime}`;
+
     document.getElementById('results').innerHTML = 
-      `Actual: ${currentPrime}<br>` +
-      `Closeness: ${closeness}%<br>` +
-      `Randomness (digit-entropy): ${randScore} bits`;
+      `Correct Prime: <code>${selectedPrime}</code><br>` +
+      `Your Guess: <code>${guess}</code><br>` +
+      `Deviation: <code>${diff}</code><br>` +
+      `Standard Deviation for range: <code>${stdev.toFixed(2)}</code><br>` +
+      `Random Guess Chance: <code>${randChance}%</code><br>` +
+      `Closeness Score: <code>${closeness}%</code><br><br>` +
+      `Sharable Result: <a href='${link}' target='_blank'>${link}</a>`;
+
     document.getElementById('resultsSection').style.display = 'block';
-  }
-
-  // Sieve of Eratosthenes
-  function getPrimesUpTo(n) {
-    const sieve = Array(n+1).fill(true);
-    sieve[0] = sieve[1] = false;
-    for (let p = 2; p*p <= n; p++) {
-      if (sieve[p]) {
-        for (let i = p*p; i <= n; i += p) sieve[i] = false;
-      }
-    }
-    return sieve.map((isPrime, i) => isPrime ? i : null).filter(x => x);
-  }
-
-  // Compute Shannon entropy of digit string
-  function computeEntropy(str) {
-    const freq = {};
-    for (let ch of str) freq[ch] = (freq[ch] || 0) + 1;
-    const len = str.length;
-    let entropy = 0;
-    for (let count of Object.values(freq)) {
-      const p = count / len;
-      entropy -= p * Math.log2(p);
-    }
-    return entropy;
   }
 </script>
 </body>
