@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NICE Prime-Retrieval Practice</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; line-height: 1.6; padding: 0 20px; }
+    h1, h2 { text-align: center; }
+    .section { margin-bottom: 30px; }
+    select, button, input { padding: 8px; margin: 5px 0; font-size: 1rem; }
+    #primeDisplay, #results { font-weight: bold; margin-top: 10px; }
+    #results { background: #f0f0f0; padding: 10px; border-radius: 5px; }
+    .encourage { margin-top: 20px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>NICE Prime-Retrieval Practice</h1>
+
+  <div class="section">
+    <p><strong>Objective:</strong> Train your memory and pattern-recognition by recalling prime numbers. This practice enhances scientific acuity (pattern detection), phenomenological awareness (inner attention), and spiritual presence (focus & discipline).</p>
+  </div>
+
+  <div class="section">
+    <label for="difficulty"><strong>Select Difficulty Stage:</strong></label><br>
+    <select id="difficulty" onchange="updateDifficultyInfo()">
+      <option value="easy">Easy (primes &lt; 100)</option>
+      <option value="medium">Medium (primes &lt; 1,000)</option>
+      <option value="hard">Hard (primes &lt; 10,000)</option>
+    </select>
+    <p id="difficultyInfo">Easy stage uses primes under 100. Mastering this builds basic recall pathways.</p>
+  </div>
+
+  <div class="section">
+    <button onclick="generatePrime()">Generate Random Prime</button>
+    <div id="primeDisplay"></div>
+  </div>
+
+  <div class="section" id="inputSection" style="display:none;">
+    <p>Enter the number you recalled:</p>
+    <input type="number" id="userGuess" placeholder="Your recalled number">
+    <button onclick="checkGuess()">Check Accuracy</button>
+  </div>
+
+  <div class="section" id="resultsSection" style="display:none;">
+    <div id="results"></div>
+    <div class="encourage">Keep refining your focus—each attempt strengthens your memory and insight.</div>
+  </div>
+
+<script>
+  let currentPrime = null;
+
+  function updateDifficultyInfo() {
+    const diff = document.getElementById('difficulty').value;
+    const info = document.getElementById('difficultyInfo');
+    if (diff === 'easy') info.textContent = 'Easy stage uses primes under 100. Mastering this builds basic recall pathways.';
+    if (diff === 'medium') info.textContent = 'Medium stage uses primes under 1,000. Strengthen pattern grouping and deeper concentration.';
+    if (diff === 'hard') info.textContent = 'Hard stage uses primes under 10,000. Cultivate high-agency focus and resilience.';
+  }
+
+  function generatePrime() {
+    const diff = document.getElementById('difficulty').value;
+    let limit = diff === 'easy' ? 100 : (diff === 'medium' ? 1000 : 10000);
+    const primes = getPrimesUpTo(limit);
+    currentPrime = primes[Math.floor(Math.random() * primes.length)];
+    document.getElementById('primeDisplay').textContent = `Memorize this prime: ${currentPrime}`;
+    document.getElementById('inputSection').style.display = 'block';
+    document.getElementById('resultsSection').style.display = 'none';
+  }
+
+  function checkGuess() {
+    const guess = parseInt(document.getElementById('userGuess').value, 10);
+    if (!currentPrime || isNaN(guess)) return;
+    const closeness = Math.max(0, (1 - Math.abs(currentPrime - guess) / currentPrime) * 100).toFixed(2);
+    const randScore = computeEntropy(currentPrime.toString()).toFixed(2);
+    document.getElementById('results').innerHTML = 
+      `Actual: ${currentPrime}<br>` +
+      `Closeness: ${closeness}%<br>` +
+      `Randomness (digit-entropy): ${randScore} bits`;
+    document.getElementById('resultsSection').style.display = 'block';
+  }
+
+  // Sieve of Eratosthenes
+  function getPrimesUpTo(n) {
+    const sieve = Array(n+1).fill(true);
+    sieve[0] = sieve[1] = false;
+    for (let p = 2; p*p <= n; p++) {
+      if (sieve[p]) {
+        for (let i = p*p; i <= n; i += p) sieve[i] = false;
+      }
+    }
+    return sieve.map((isPrime, i) => isPrime ? i : null).filter(x => x);
+  }
+
+  // Compute Shannon entropy of digit string
+  function computeEntropy(str) {
+    const freq = {};
+    for (let ch of str) freq[ch] = (freq[ch] || 0) + 1;
+    const len = str.length;
+    let entropy = 0;
+    for (let count of Object.values(freq)) {
+      const p = count / len;
+      entropy -= p * Math.log2(p);
+    }
+    return entropy;
+  }
+</script>
+</body>
+</html>
